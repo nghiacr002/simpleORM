@@ -1,6 +1,7 @@
 <?php
 
 namespace SimpleORM\Adapter;
+use SimpleORM\Helper\Exception;
 
 class DbMockup implements IAdapter
 {
@@ -64,7 +65,7 @@ class DbMockup implements IAdapter
 
         if (!$stmt)
         {
-            throw new \Exception("Invalid STMT Query Statement provider: " . $this->_oDriver->error, HTTP_CODE_NOT_IMPLEMENTED);
+            throw new Exception("Invalid STMT Query Statement provider: " . $this->_oDriver->error, HTTP_CODE_NOT_IMPLEMENTED);
         }
         if (count($bind_params))
         {
@@ -82,7 +83,7 @@ class DbMockup implements IAdapter
         if ($stmt->errno)
         {
             $this->_aErrors = $stmt->error_list;
-            throw new \Exception($this->_aErrors[0]['error'], $this->_aErrors[0]['errno']);
+            throw new Exception($this->_aErrors[0]['error'], $this->_aErrors[0]['errno']);
         } else
         {
             $result = $this->getResult($stmt, $bNonAffectRow);

@@ -17,9 +17,28 @@ class Query
 	protected $_aBindParams;
 	protected $_aMainFrom;
 	protected $_aLimit;
+	protected $_oAdapter = null;
 	public function __construct($sCommand = "")
 	{
 		$this->setCommand ( $sCommand );
+	}
+	public function setAdapter($oAdapter)
+	{
+		$this->_oAdapter = $oAdapter;
+	}
+	public function getOne()
+	{
+		$mResult = $this->execute();
+		return (isset($mResult[0])) ? $mResult[0] : null;
+	}
+	public function getAll()
+	{
+
+	}
+	public function execute()
+	{
+		list($sSql, $aBindParams) = $this->build();
+		return $this->_oAdapter->execute($sSql, $aBindParams);
 	}
 	public function setRawSQL($sQuery, $aBindParams = array())
 	{
@@ -115,12 +134,6 @@ class Query
 				$this->_sSQL,
 				$this->_aBindParams
 		);
-	}
-	public function rawSQL($sql, $bind_data = array())
-	{
-		$this->_sSQL = $sql;
-		$this->_aBindParams = $bind_data;
-		return $this;
 	}
 	public function limit($iPage, $iLimit)
 	{

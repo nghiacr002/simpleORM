@@ -83,7 +83,7 @@ class PDO implements IAdapter
 		}
 		catch(\PDOException $ex)
 		{
-			throw new \Exception("Could not connect to database with error [".$ex->getCode()."]". $ex->getMessage());
+			throw new Exception("Could not connect to database with error [".$ex->getCode()."]". $ex->getMessage());
 		}
 	}
 
@@ -116,7 +116,7 @@ class PDO implements IAdapter
 		{
 			$sMessage = "Invalid STMT Query Statement provider: " . implode("|",$this->_oDriver->errorInfo()) . " ";
 			$sMessage .= $query;
-			throw new \Exception ( $sMessage, HTTP_CODE_NOT_IMPLEMENTED );
+			throw new Exception ( $sMessage, 404 );
 		}
 		try
 		{
@@ -143,7 +143,7 @@ class PDO implements IAdapter
 			if ($stmt->errorCode() != self::SUCCESS_CODE &&  $stmt->errorCode() != 0)
 			{
 				$this->_aErrors = $stmt->errorInfo();
-				throw new \Exception("Query error ". $stmt->errorCode());
+				throw new Exception("Query error ". $stmt->errorCode());
 			}
 			else
 			{
@@ -160,7 +160,7 @@ class PDO implements IAdapter
 		}
 		catch(\Exception $ex)
 		{
-			throw new \Exception("Query error [". $ex->getCode()."]".$ex->getMessage()." : ". $this->_sLastQuery);
+			throw new Exception("Query error [". $ex->getCode()."]".$ex->getMessage()." : ". $this->_sLastQuery);
 		}
 		//$stmt->closeCursor();
 

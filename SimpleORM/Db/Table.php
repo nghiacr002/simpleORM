@@ -12,17 +12,23 @@ class Table
     protected $_sAlias;
 	protected $_oAdapter;
 	protected $_oRelation;
+
     public function __construct($sTableName = "", $mPrimaryKey = null)
     {
-        if (empty($sTableName))
+        if (!empty($sTableName))
         {
-            $sTableName = $this->_sTableName;
+            $this->_sTableName = $sTableName;
         }
         if ($mPrimaryKey)
         {
             $this->_mPrimaryKey = $mPrimaryKey;
         }
         $this->_oRelation = new Relation();
+        $this->config();
+    }
+    protected function config()
+    {
+		return true;
     }
 	public function getRelation()
 	{
@@ -74,18 +80,10 @@ class Table
         }
         return $columns;
     }
-
-    public function executeQuery(\SimpleORM\Helper\Query $query)
+    public function setAdapter($oAdapter)
     {
-        list($sSql, $aBindParams) = $query->build();
-        return $this->getAdapter()->execute($sSql, $aBindParams);
-    }
-
-    public function createQuery($sType = "")
-    {
-        $oQuery = new \SimpleORM\Helper\Query($sType);
-        $oQuery->from($this->getTableName(), $this->getAlias());
-        return $oQuery;
+    	$this->_oAdapter = $oAdapter;
+    	return $this;
     }
 	public function getAdapter()
 	{

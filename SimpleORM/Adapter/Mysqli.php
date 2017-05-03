@@ -1,7 +1,7 @@
 <?php
 
 namespace SimpleORM\Adapter;
-
+use SimpleORM\Helper\Exception;
 class Mysqli implements IAdapter
 {
 	private $_oDriver = null;
@@ -58,7 +58,7 @@ class Mysqli implements IAdapter
 		{
 			$sMessage = "Invalid STMT Query Statement provider: " . $this->_oDriver->error . " ";
 			$sMessage .= $query;
-			throw new \Exception ( $sMessage, HTTP_CODE_NOT_IMPLEMENTED );
+			throw new Exception ( $sMessage );
 		}
 		if (count ( $bind_params ))
 		{
@@ -82,7 +82,7 @@ class Mysqli implements IAdapter
 		if ($stmt->errno)
 		{
 			$this->_aErrors = $stmt->error_list;
-			throw new \Exception ( $this->_aErrors [0] ['error'], $this->_aErrors [0] ['errno'] );
+			throw new Exception ( $this->_aErrors [0] ['error'], $this->_aErrors [0] ['errno'] );
 		} else
 		{
 			$result = $this->getResult ( $stmt, $bNonAffectRow );

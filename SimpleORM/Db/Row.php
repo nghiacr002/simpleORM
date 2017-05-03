@@ -1,6 +1,7 @@
 <?php
 
 namespace SimpleORM\Db;
+namespace SimpleORM\Helper;
 class Row
 {
     protected $_oTable;
@@ -138,15 +139,15 @@ class Row
     }
     public function beforeSave()
     {
-
+		return true;
     }
     public function beforeUpdate()
     {
-
+    	return true;
     }
     public function beforeDelete()
     {
-
+    	return true;
     }
     protected function catchError()
     {

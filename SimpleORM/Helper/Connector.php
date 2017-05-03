@@ -5,8 +5,12 @@ use SimpleORM;
 class Connector
 {
 	private $_oAdapter = null;
+	private $_aConfigs = array();
+	private static $instance;
 	public function __construct($aConfigs = array())
 	{
+		self::$instance = $this;
+		$this->_aConfigs = $aConfigs;
 		$sAdapterType = isset($aConfigs['adapter']) ? strtolower($aConfigs['adapter']) : "mysqli";
 		$oAdapter = null;
 		switch ($sAdapterType)
@@ -28,14 +32,22 @@ class Connector
 				}
 				else
 				{
-					throw new \Exception("Not found adapter");
+					throw new SimpleORMException("Not found adapter");
 				}
 		}
 		$oAdapter->connect($aConfigs);
 		$this->_oAdapter = $oAdapter;
 	}
+	public static function getTableName($sName)
+	{
+		return self::$instance->_aConfigs['prefix'] . $sName;
+	}
 	public function getAdapter()
 	{
 		return $this->_oAdapter;
+	}
+	public static function getInstance()
+	{
+		return self::$instance;
 	}
 }
