@@ -1,30 +1,40 @@
 <?php
-
 namespace SimpleORM\Db;
-namespace SimpleORM\Helper;
-class Row
+use SimpleORM\Helper\Query as Query;
+use SimpleORM\Helper\Object;
+class Row extends Object
 {
     protected $_oTable;
     protected $_oValidator;
     protected $_aErrors;
     protected $_aData;
-    public function __construct($mTableName = "")
+    public function __construct()
     {
-        if (is_object($mTableName))
-        {
-            $this->_oTable = $mTableName;
-        } else
-        {
-            $this->_oTable = new \SimpleORM\Db\Table($mTableName);
-        }
+		$this->init();
     }
-
+    protected function init()
+    {
+    	return true;
+    }
+    public function getRelation()
+    {
+    	if(!$this->_oTable)
+    	{
+    		return null;
+    	}
+    	return $this->_oTable->getRelation();
+    }
+    public function setTable(\SimpleORM\Db\Table $oTable)
+    {
+    	$this->_oTable = $oTable;
+    	return $this;
+    }
     public function getTable()
     {
         return $this->_oTable;
     }
 
-    public function mapData($aData)
+    public function mapFieldValues($aData)
     {
         foreach ($aData as $iKey => $mData)
         {
@@ -35,26 +45,26 @@ class Row
         }
         return $this;
     }
-
-    public function mergeData($data)
+	public function getValues()
+	{
+		return $this->toArray();
+	}
+    public function setFieldValues($aData, $bIsMerge = false)
     {
-        if (is_array($data))
+    	if(!$bIsMerge)
+    	{
+    		$this->_aData = $aData;
+    	}
+    	else if (is_array($aData))
         {
-            foreach ($data as $key => $value)
+            foreach ($aData as $key => $value)
             {
                 $this->_aData[$key] = $value;
             }
         }
         return $this;
     }
-
-    public function setData($data)
-    {
-        $this->_aData = $data;
-        return $this;
-    }
-
-    public function unsetData($sKey)
+    public function removeField($sKey)
     {
         if (isset($this->_aData[$sKey]))
         {
@@ -73,45 +83,13 @@ class Row
         $this->_aErrors[] = $sError;
         return $this;
     }
-
-    public function validator()
-    {
-        if (!$this->_oValidator)
-        {
-            $this->_oValidator = new \APP\Engine\Validator($this->_aData);
-        }
-        return $this->_oValidator;
-    }
-
-    public function isValid()
-    {
-        $this->_aErrors = array();
-        $aValidRules = $this->_oTable->getValidateRules();
-        $this->validator()->rules($aValidRules);
-        $bValidate = $this->validator()->validate();
-        if ($bValidate)
-        {
-            $bValidate = $this->_oTable->businessValidate($this);
-        }
-        if ($bValidate)
-        {
-            return true;
-        }
-        foreach ($this->_oValidator->errors() as $key => $error)
-        {
-            $this->_aErrors[$key] = implode(',', $error);
-        }
-        return false;
-    }
-
     public function save()
     {
     	$this->beforeSave();
         $query = new Query();
         $query->setCommand("insert");
         $query->setTableData($this->_oTable->getTableName(), $this->_aData);
-        $mResult = $this->_oTable->executeQuery($query);
-        $this->_oTable->cleanCache();
+        $query->execute();
         return $mResult;
     }
     public function update()
@@ -121,8 +99,7 @@ class Row
         $query->setCommand("update");
         $query->setTableData($this->_oTable->getTableName(), $this->_aData);
         $this->_buildWherePrimary($query);
-        $bResult = $this->_oTable->executeQuery($query);
-        $this->_oTable->cleanCache();
+        $bResult = $query->execute();
         return $bResult;
     }
     public function delete()
@@ -132,9 +109,7 @@ class Row
         $query->setCommand("delete");
         $this->_buildWherePrimary($query);
         $query->from($this->_oTable->getTableName());
-        $bResult = $this->_oTable->executeQuery($query);
-        //$this->catchError();
-        $this->_oTable->cleanCache();
+        $bResult = $query->execute();
         return $bResult;
     }
     public function beforeSave()
@@ -172,6 +147,7 @@ class Row
         {
             $query->where($sPrimaryKey, $this->{$sPrimaryKey});
         }
+        return $query;
     }
 
     public function toArray()
@@ -179,9 +155,21 @@ class Row
         return $this->_aData;
     }
 
-    public function href()
+    public function getURL()
     {
         return "#";
     }
-
+    public function __get($sName)
+    {
+    	$oRelation = $this->getRelation();
+    	if($oRelation)
+    	{
+    		$oObject = $oRelation->get($sName);
+			if($oObject)
+			{
+				return $oObject;
+			}
+    	}
+    	return parent::__get($sName);
+    }
 }

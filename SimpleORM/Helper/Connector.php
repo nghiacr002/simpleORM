@@ -40,7 +40,15 @@ class Connector
 	}
 	public static function getTableName($sName)
 	{
-		return self::$instance->_aConfigs['prefix'] . $sName;
+		$sPrefix = self::$instance->_aConfigs['prefix'];
+		if(!empty($sPrefix))
+		{
+			if(strpos($sName,$sPrefix ) !== 0)
+			{
+				$sName = $sPrefix. $sName;
+			}
+		}
+		return $sName;
 	}
 	public function getAdapter()
 	{

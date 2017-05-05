@@ -1,8 +1,13 @@
 <?php
 namespace SimpleORM\Db;
+
 class Relation
 {
 	protected $_aMappers = array();
+	const ONE_TO_MANY = "OneToMany";
+	const ONE_TO_ONE = "OneToOne";
+	const MANY_TO_MANY = "ManyToMany";
+	const MANY_TO_ONE = "ManyToOne";
 	public function __construct()
 	{
 		$this->init();
@@ -11,26 +16,91 @@ class Relation
 	{
 		return $this;
 	}
-	public function addOneToMany($sSourceColumn, $sTargetColumn,$sTargetTable, $aOptions = array())
+	/**
+	 *
+	 * @param unknown $sName
+	 * @param array $aParams. Example:
+	 * array(
+	 * 	'source' => '',
+	 *  'target' => '',
+	 *  'table' => '',
+	 *  'options' => array(),
+	 * )
+	 * @return \SimpleORM\Db\Relation
+	 */
+	public function hasMany($sName,$aParams = array())
 	{
-		return $this->set("hasOneToMany",$sColumn,$sTargetColumn,$sTargetTable,$aOptions = array());
+		$aParams['type'] = Relation::ONE_TO_MANY;
+		return $this->set($sName,$aParams);
 	}
-	public function addOneToOne($sSourceColumn, $sTargetColumn,$sTargetTable,$aOptions = array())
+	/**
+	 *
+	 * @param unknown $sName
+	 * @param array $aParams. Example:
+	 * array(
+	 * 	'source' => '',
+	 *  'target' => '',
+	 *  'table' => '',
+	 *  'options' => array(),
+	 * )
+	 * @return \SimpleORM\Db\Relation
+	 */
+	public function hasOne($sName,$aParams = array())
 	{
-		return $this->set("hasOneToOne",$sColumn,$sTargetColumn,$sTargetTable,$aOptions = array());
+		$aParams['type'] = Relation::ONE_TO_ONE;
+		return $this->set($sName,$aParams);
 	}
-	public function addManyToMany($sSourceColumn, $sTargetColumn,$sTargetTable,$aOptions = array())
+	/**
+	 *
+	 * @param unknown $sName
+	 * @param array $aParams. Example:
+	 * array(
+	 * 	'source' => '',
+	 *  'target' => '',
+	 *  'table' => '',
+	 *  'options' => array(),
+	 * )
+	 * @return \SimpleORM\Db\Relation
+	 */
+	public function hasManyToMany($sName,$aParams = array())
 	{
-		return $this->set("hasManyToMany",$sColumn,$sTargetColumn,$sTargetTable);
+		$aParams['type'] = Relation::MANY_TO_MANY;
+		return $this->set($sName,$aParams);
 	}
-	public function addManyToOne($sSourceColumn, $sTargetColumn,$sTargetTable,$aOptions = array())
+	/**
+	 *
+	 * @param unknown $sName
+	 * @param array $aParams. Example:
+	 * array(
+	 * 	'source' => '',
+	 *  'target' => '',
+	 *  'table' => '',
+	 *  'options' => array(),
+	 * )
+	 * @return \SimpleORM\Db\Relation
+	 */
+	public function belongsTo($sName,$aParams = array())
 	{
-		return $this->set("hasManyToOne",$sColumn,$sTargetColumn,$sTargetTable,$aOptions = array());
+		$aParams['type'] = Relation::MANY_TO_ONE;
+		return $this->set($sName,$aParams);
 	}
-	protected function set($sType, $sSourceColumn, $sTargetColumn, $sTargetTable, $aOptions = array())
+	public function getInfo()
 	{
-		$this->_aMappers[$sTargetColumn] = array();
+		return $this->_aMappers;
+	}
+	public function get($sName)
+	{
+		if(isset($this->_aMappers[$sName]))
+		{
+			$aParams = $this->_aMappers[$sName];
+			//var_dump($aParams);die();
+
+		}
+		return null;
+	}
+	protected function set($sName, $aParams = array())
+	{
+		$this->_aMappers[$sName] = $aParams;
 		return $this;
 	}
-
 }

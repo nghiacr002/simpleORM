@@ -2,70 +2,63 @@
 
 namespace SimpleORM\Db;
 
+use SimpleORM\Helper\Connector;
+
 class Table
 {
     protected $_sTableName;
+    protected $_sClassRow = "\SimpleORM\Db\Row";
     protected $_mPrimaryKey;
-    protected $_oQuery;
-    protected $_aValidateRules;
-    protected $_sRowClass;
     protected $_sAlias;
+
 	protected $_oAdapter;
 	protected $_oRelation;
 
-    public function __construct($sTableName = "", $mPrimaryKey = null)
+    public function __construct()
     {
-        if (!empty($sTableName))
-        {
-            $this->_sTableName = $sTableName;
-        }
-        if ($mPrimaryKey)
-        {
-            $this->_mPrimaryKey = $mPrimaryKey;
-        }
+        $this->_oAdapter = Connector::getInstance()->getAdapter();
         $this->_oRelation = new Relation();
+
         $this->config();
     }
     protected function config()
     {
 		return true;
     }
-	public function getRelation()
-	{
-		return $this->_oRelation;
-	}
-    public function getRowClass()
-    {
-        return $this->_sRowClass;
-    }
-
-    public function businessValidate(\SimpleORM\Db\Row $mData)
-    {
-        return true;
-    }
-
-    public function getValidateRules()
-    {
-        return $this->_aValidateRules;
-    }
-
-    public function getPrimaryKey()
-    {
-        return $this->_mPrimaryKey;
-    }
-
     public function setPrimaryKey($mKey)
     {
         $this->_mPrimaryKey = $mKey;
         return $this;
     }
-    public function createRow($data = array())
+    public function setTableName($sName)
     {
-        $mRow = new \SimpleORM\Db\Row($this);
-        $mRow->setData($data);
-        return $mRow;
+    	$sName = Connector::getTableName($sName);
+    	$this->_sTableName = $sName;
+    	return $this;
     }
-
+    public function setAlias($sAlias)
+    {
+    	$this->_sAlias = $sAlias;
+    	return $this;
+    }
+    public function createRow($mData = array())
+    {
+    	$oRow = null;
+    	if(!empty($this->_sClassRow) && class_exists($this->_sClassRow))
+    	{
+    		$oRow = new $this->_sClassRow();
+    	}
+    	else
+    	{
+    		$oRow = new Row();
+    	}
+    	if($oRow)
+    	{
+    		$oRow->setTable($this);
+    		$oRow->setFieldValues($mData);
+    	}
+        return $oRow;
+    }
     public function getColumns()
     {
         $adapter = $this->getAdapter();
@@ -85,6 +78,14 @@ class Table
     	$this->_oAdapter = $oAdapter;
     	return $this;
     }
+    public function getRelation()
+    {
+    	return $this->_oRelation;
+    }
+    public function getPrimaryKey()
+    {
+    	return $this->_mPrimaryKey;
+    }
 	public function getAdapter()
 	{
 		return $this->_oAdapter;
@@ -103,9 +104,5 @@ class Table
         return $this->_sAlias;
     }
 
-    public function setAlias($sAlias)
-    {
-        $this->_sAlias = $sAlias;
-        return $this;
-    }
+
 }

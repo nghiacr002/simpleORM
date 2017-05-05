@@ -2,40 +2,75 @@
 namespace SimpleORM\Db;
 
 use SimpleORM\Helper\Connector;
+use DbTest\Client\Table;
 
 class Model
 {
-	protected $_oCurrentQuery = null;
 	protected $_oTable = null;
-	public function __construct($mTable)
+	protected $_sClassTable = "";
+	protected $_sTableName = "";
+	public function __construct()
 	{
-		$this->setTable($mTable);
 		$this->init();
 	}
-	public function setTable($mTable)
+	public function getOne($aConds, $sSelect = "*")
+	{
+		$oQuery = $this->createQuery("SELECT");
+		$oQuery->select($sSelect);
+		if(isset($aConds[0]) && !is_array($aConds[0]))
+		{
+			$aConds = array($aConds);
+		}
+		foreach($aConds as $aCond)
+		{
+			$params = isset($aCond[0]) ? $aCond[0] : array();
+			$values = isset($aCond[1]) ? $aCond[1] : array();
+			$operator = isset($aCond[2]) ? $aCond[2] : "=";
+			$cond = isset($aCond[3]) ? $aCond[3] : "AND";
+			$oQuery->where($params,$values,$operator, $cond);
+		}
+		return $oQuery->getOne();
+	}
+	public function setTable($mTable, $sClassName = "")
 	{
 		if(is_string($mTable))
 		{
-			$this->_oTable = $this->createTable($mTable);
+			$this->_oTable = self::createTable($mTable, $sClassName);
 		}
 		else if($mTable instanceof Table)
 		{
 			$this->_oTable = $mTable;
 		}
 	}
-	public function createTable($mTable)
+	public static function createTable($sTableName, $sClassName = "")
 	{
-		$sTableName = Connector::getTableName($mTable);
-		$oTable = new Table($sTableName);
-		$oTable->setAdapter(Connector::getInstance()->getAdapter());
+		$oTable = null;
+		if(!empty($sClassName) && !class_exists($sClassName))
+		{
+			$oTable = new $sClassName();
+		}
+		else
+		{
+			$sTableName = Connector::getTableName($sTableName);
+			$oTable = new Table();
+			$oTable->setTableName($sTableName);
+		}
 		return $oTable;
 	}
 	public function getTable()
 	{
+		if(!$this->_oTable)
+		{
+			$this->_oTable = self::createTable($this->_sTableName, $this->_sClassTable);
+		}
 		return $this->_oTable;
 	}
 	protected function init()
 	{
+		if(!empty($this->_sTableName))
+		{
+			$this->_oTable = self::createTable($this->_sTableName);
+		}
 		return true;
 	}
 	public function executeQuery(\SimpleORM\Helper\Query $query)
@@ -47,26 +82,10 @@ class Model
 	public function createQuery($sType = "SELECT")
 	{
 		$oQuery = new \SimpleORM\Helper\Query($sType);
-		$oQuery->from($this->_oTable->getTableName(), $this->_oTable->getAlias());
-		$oQuery->setAdapter($this->_oTable->getAdapter());
-		if($sType == "SELECT")
-		{
-			$oQuery->select("*");
-		}
-		$this->_oCurrentQuery = $oQuery;
+		$oTable = $this->getTable();
+		$oQuery->from($oTable->getTableName(), $oTable->getAlias());
+		$oQuery->setAdapter($oTable->getAdapter());
+		$oQuery->setTable($oTable);
 		return $oQuery;
 	}
-	public function __call($sName, $arguments = array())
-	{
-		if($this->_oCurrentQuery)
-		{
-			if (method_exists($this->_oCurrentQuery, $sName))
-			{
-				return call_user_func_array(array($this, $sName), $arguments);
-			}
-
-		}
-		return null;
-	}
-
 }

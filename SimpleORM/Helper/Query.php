@@ -2,6 +2,8 @@
 
 namespace SimpleORM\Helper;
 
+use SimpleORM\Db\Table;
+
 class Query
 {
 	protected $_aConds = array ();
@@ -18,22 +20,65 @@ class Query
 	protected $_aMainFrom;
 	protected $_aLimit;
 	protected $_oAdapter = null;
+	protected $_oTable = null;
 	public function __construct($sCommand = "")
 	{
 		$this->setCommand ( $sCommand );
+		$this->_oAdapter = Connector::getInstance()->getAdapter();
+	}
+	public function setTable(\SimpleORM\Db\Table $oTable)
+	{
+		$this->_oTable = $oTable;
+		return $this;
 	}
 	public function setAdapter($oAdapter)
 	{
 		$this->_oAdapter = $oAdapter;
 	}
-	public function getOne()
+	public function getField($sFieldName)
+	{
+		$this->_aSelects = array($sFieldName);
+		$mResult = $this->getOne(true);
+		return isset($mResult[$sFieldName]) ? $mResult[$sFieldName] : null;
+	}
+	public function getOne($bToArray = false )
 	{
 		$mResult = $this->execute();
-		return (isset($mResult[0])) ? $mResult[0] : null;
+		$mResult =  (isset($mResult[0])) ? $mResult[0] : array();
+		if($bToArray)
+		{
+			return $mResult;
+		}
+		else
+		{
+			if(!$this->_oTable)
+			{
+				$this->_oTable = new Table($this->_sTableName);
+			}
+			return $this->_oTable->createRow($mResult);
+		}
 	}
-	public function getAll()
+	public function getAll($bToArray = false )
 	{
+		$mResult = $this->execute();
+		if(!$bToArray)
+		{
+			if(!$this->_oTable)
+			{
+				$this->_oTable = new Table($this->_sTableName);
+			}
+			$aResults = array();
+			if(is_array($mResult) && count($mResult))
+			{
+				foreach($mResult as $iKey => $aResult)
+				{
+					$aResults[] = $this->_oTable->createRow($aResult);
+				}
+			}
+			return $aResults;
+		}
 
+		return $mResult;
 	}
 	public function execute()
 	{
