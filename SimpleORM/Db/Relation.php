@@ -90,10 +90,15 @@ class Relation
 	}
 	public function get($sName)
 	{
+		if(isset($this->{$sName}))
+		{
+			return $this->{$sName};
+		}
 		if(isset($this->_aMappers[$sName]))
 		{
 			$aParams = $this->_aMappers[$sName];
-			//var_dump($aParams);die();
+			//$this->{$sName} = new \stdClass();
+			return $this->{$sName};
 
 		}
 		return null;
