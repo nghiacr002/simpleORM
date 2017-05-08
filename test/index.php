@@ -37,12 +37,11 @@ $oClientRow->getRelation()->hasMany('apps',array(
 	'target' => 'client_id',
 	'table' => 'client_app'
 ));
-var_dump($oClientRow->apps);
-var_dump($oClientRow->apps);die();
+var_dump($oClientRow->getRelation()->getRef('apps')->getId());die();
 /*$mData = $oModel->createQuery()
 		->select('*')
 		->where('client_id',1,'>')
 		->getOne();
 */
-var_dump($oClientRow->getRelation());
+//var_dump($oClientRow->getRelation());
 die();

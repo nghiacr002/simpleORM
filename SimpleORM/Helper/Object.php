@@ -44,7 +44,7 @@ class Object
     {
         if (method_exists($this, $sName))
         {
-            call_user_func_array(array($this, $sName), $arguments);
+            return call_user_func_array(array($this, $sName), $arguments);
         }
         return null;
     }

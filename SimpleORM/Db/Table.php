@@ -3,27 +3,54 @@
 namespace SimpleORM\Db;
 
 use SimpleORM\Helper\Connector;
+use SimpleORM;
 
 class Table
 {
     protected $_sTableName;
     protected $_sClassRow = "\SimpleORM\Db\Row";
+    protected $_sClassModel = "\SimpleORM\Db\Model";
     protected $_mPrimaryKey;
     protected $_sAlias;
-
+	protected $_oModel;
 	protected $_oAdapter;
 	protected $_oRelation;
+	protected $_aOptions = array();
 
-    public function __construct()
+    public function __construct($aOptions = array())
     {
-        $this->_oAdapter = Connector::getInstance()->getAdapter();
-        $this->_oRelation = new Relation();
-
+        $this->_oRelation = new Relation($this);
+		$this->_aOptions = $aOptions;
         $this->config();
     }
-    protected function config()
+    public function setOptions($aOptions = array(), $bReconfigure = true)
     {
-		return true;
+    	$this->_aOptions = $aOptions;
+    	if($bReconfigure)
+    	{
+    		$this->config();
+    	}
+    	return $this;
+    }
+    public function getModel()
+    {
+    	$sClassModel = $this->_sClassModel;
+    	$sName = "model_".md5($this->_sClassModel);
+    	if($this->_oModel)
+    	{
+    		return $this->_oModel;
+    	}
+    	if(!empty($sClassModel) && class_exists($sClassModel))
+    	{
+			$oModel =  new $sClassModel();
+    	}
+    	if($oModel instanceof SimpleORM\Db\Model)
+    	{
+    		$oModel->setTable($this);
+    		$this->_oModel = $oModel;
+    		return $this->_oModel;
+    	}
+    	throw new \Exception("Model of table ". $this->getTableName() ." not found");
     }
     public function setPrimaryKey($mKey)
     {
@@ -88,13 +115,17 @@ class Table
     }
 	public function getAdapter()
 	{
+		if(!$this->_oAdapter)
+		{
+			//$this->_oAdapter = Connector::getInstance()->getAdapter();
+			$this->setAdapter(Connector::getInstance()->getAdapter());
+		}
 		return $this->_oAdapter;
 	}
     public function getTableName()
     {
         return $this->_sTableName;
     }
-
     public function getAlias()
     {
         if (!$this->_sAlias)
@@ -103,6 +134,17 @@ class Table
         }
         return $this->_sAlias;
     }
-
-
+    protected function config()
+    {
+    	$aOptions = $this->_aOptions;
+    	if(isset($aOptions['primaryKey']))
+    	{
+    		$this->_mPrimaryKey = $aOptions['primaryKey'];
+    	}
+    	if(isset($aOptions['alias']))
+    	{
+    		$this->_sAlias = $aOptions['alias'];
+    	}
+    	return true;
+    }
 }

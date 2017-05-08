@@ -164,7 +164,7 @@ class Row extends Object
     	$oRelation = $this->getRelation();
     	if($oRelation)
     	{
-    		$oObject = $oRelation->get($sName);
+    		$oObject = $oRelation->get($sName, $this->getValues());
 			if($oObject)
 			{
 				return $oObject;
