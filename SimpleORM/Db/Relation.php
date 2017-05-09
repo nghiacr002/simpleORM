@@ -77,7 +77,7 @@ class Relation
 	}
 	/**
 	 *
-	 * @param unknown $sName
+	 * @param string $sName
 	 * @param array $aParams. Example:
 	 * array(
 	 * 	'source' => '',

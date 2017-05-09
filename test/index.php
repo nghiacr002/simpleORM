@@ -37,7 +37,15 @@ $oClientRow->getRelation()->hasMany('apps',array(
 	'target' => 'client_id',
 	'table' => 'client_app'
 ));
-var_dump($oClientRow->getRelation()->getRef('apps')->getId());die();
+$oClientRow->getRelation()->belongsTo('type',array(
+	'source' => 'level',
+	'target' => 'id',
+	'table' => 'client_type',
+	'option' => array(
+		''
+	)
+));
+var_dump($oClientRow->type->level_name);die();
 /*$mData = $oModel->createQuery()
 		->select('*')
 		->where('client_id',1,'>')

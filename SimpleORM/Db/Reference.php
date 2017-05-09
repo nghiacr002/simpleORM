@@ -47,6 +47,18 @@ class Reference
 				return $this->_getOneToOne();
 			case Relation::ONE_TO_MANY:
 				return $this->_getOneToMany();
+			case Relation::MANY_TO_ONE:
+				return $this->_getManyToOne();
+		}
+	}
+	protected function _getManyToOne()
+	{
+		$oModel = $this->getDestination()->getModel();
+		if($oModel)
+		{
+			$aParams = $this->_aParams;
+			$aConds = $this->buildCondRefs();
+			return $oModel->getOne($aConds);
 		}
 	}
 	protected function _getOneToMany()
@@ -59,10 +71,17 @@ class Reference
 			return $oModel->getAll($aConds);
 		}
 		//$oModel->
-		return null;
+		return array();
 	}
 	protected function _getOneToOne()
 	{
+		$oModel = $this->getDestination()->getModel();
+		if($oModel)
+		{
+			$aParams = $this->_aParams;
+			$aConds = $this->buildCondRefs();
+			return $oModel->getOne($aConds);
+		}
 		return null;
 	}
 	protected function buildCondRefs()
