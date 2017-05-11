@@ -1,6 +1,8 @@
 <?php
 namespace SimpleORM\Db;
 use SimpleORM\Db\Relation;
+use SimpleORM\Helper\Exception;
+use SimpleORM\Helper\Connector;
 
 class Reference
 {
@@ -49,7 +51,36 @@ class Reference
 				return $this->_getOneToMany();
 			case Relation::MANY_TO_ONE:
 				return $this->_getManyToOne();
+			case Relation::MANY_TO_MANY:
+				return $this->_getManyToMany();
 		}
+	}
+	protected function _getManyToMany()
+	{
+		$oModelDestination = $this->getDestination()->getModel();
+		//$oModelSource = $this->getSource()->getModel();
+		$aOption = isset($this->_aParams['option']) ? $this->_aParams['option'] : array();
+
+		if(!isset($aOption['bridge']) || !isset($aOption['bridge']['table']))
+		{
+			throw new Exception("No bridge table found");
+		}
+		if(!isset($aOption['bridge']['target']) || !isset($aOption['bridge']['source']))
+		{
+			throw new Exception("No bridge condition found");
+		}
+
+		$mRefData = isset($this->_aParams['ref_data']) ? $this->_aParams['ref_data'] : array();
+		$oQuery = $oModelDestination->createQuery("SELECT");
+		$sAlias = $aOption['bridge']['table'];
+		$sDesAlias = $this->getDestination()->getAlias();
+		$sCondition = $sAlias. '.'.$aOption['bridge']['target'][$this->_aParams['target']]. ' = '
+					.  $sDesAlias . '.'. $this->_aParams['target'];
+		$oQuery->join(Connector::getTableName($aOption['bridge']['table']), $sCondition, $sAlias);
+		$oQuery->select($sDesAlias.'.*');
+		$oQuery->where($this->_aParams['source'], isset($mRefData[$this->_aParams['source']]) ? $mRefData[$this->_aParams['source']] : null);
+		$mResult = $oQuery->getAll();
+		return $mResult;
 	}
 	protected function _getManyToOne()
 	{

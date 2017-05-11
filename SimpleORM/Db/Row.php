@@ -122,6 +122,7 @@ class Row extends Object
     }
     public function beforeDelete()
     {
+    	//delete all relations
     	return true;
     }
     protected function catchError()

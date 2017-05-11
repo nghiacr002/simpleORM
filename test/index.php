@@ -32,24 +32,36 @@ if(count($mData))
 
 $oModel = new ClientModel();
 $oClientRow = $oModel->getOne(array('client_id',1,'>'));
+/*$oClientRow->getRelation()->hasOne('info',array(
+	'source' => 'client_id',
+	'target' => 'client_id',
+	'table' => 'client_info'
+));
 $oClientRow->getRelation()->hasMany('apps',array(
 	'source' => 'client_id',
 	'target' => 'client_id',
 	'table' => 'client_app'
 ));
-$oClientRow->getRelation()->belongsTo('type',array(
+$oClientRow->getRelation()->belongsTo('client_type',array(
 	'source' => 'level',
 	'target' => 'id',
 	'table' => 'client_type',
-	'option' => array(
-		''
-	)
 ));
-var_dump($oClientRow->type->level_name);die();
-/*$mData = $oModel->createQuery()
-		->select('*')
-		->where('client_id',1,'>')
-		->getOne();
-*/
-//var_dump($oClientRow->getRelation());
+$oClientRow->getRelation()->hasManyToMany('groups',array(
+	'source' => 'client_id',
+	'target' => 'id',
+	'table' => 'group',
+	'option' => array(
+		'bridge' => array(
+			'table' => 'client_group',
+			'source' => array(
+				'client_id' => 'client_id'
+			),
+			'target' => array(
+				'id' => 'group_id',
+			)
+		)
+	)
+));*/
+var_dump($oClientRow->groups);
 die();

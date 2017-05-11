@@ -41,7 +41,7 @@ class DbMockup implements IAdapter
 
     public function execute($query, $bind_params = array())
     {
-        if ($query instanceof \APP\Engine\Database\Query)
+        if ($query instanceof \SimpleORM\Helper\Query)
         {
             list($query, $bind_params) = $query->build();
         }

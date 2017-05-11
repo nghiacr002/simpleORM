@@ -26,7 +26,7 @@ class Relation
 	}
 	/**
 	 *
-	 * @param unknown $sName
+	 * @param unknown $sName: Name of reference
 	 * @param array $aParams. Example:
 	 * array(
 	 * 	'source' => '',
@@ -43,7 +43,7 @@ class Relation
 	}
 	/**
 	 *
-	 * @param unknown $sName
+	 * @param unknown $sName: Name of reference
 	 * @param array $aParams. Example:
 	 * array(
 	 * 	'source' => '',
@@ -60,7 +60,7 @@ class Relation
 	}
 	/**
 	 *
-	 * @param unknown $sName
+	 * @param unknown $sName: Name of reference
 	 * @param array $aParams. Example:
 	 * array(
 	 * 	'source' => '',
@@ -77,7 +77,7 @@ class Relation
 	}
 	/**
 	 *
-	 * @param string $sName
+	 * @param string $sName: Name of reference
 	 * @param array $aParams. Example:
 	 * array(
 	 * 	'source' => '',
