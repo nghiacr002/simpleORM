@@ -14,7 +14,8 @@ $configs = array( 'host' => 'localhost',
     'prefix' => 'tbl_',
     'adapter' => 'mysqli',
     'charset' => 'utf8',
-	'type' => 'mysql');
+	'type' => 'mysql'
+);
 $db = new Connector($configs);
 /*
 $oModel = new Model("client");

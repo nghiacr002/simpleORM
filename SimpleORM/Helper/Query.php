@@ -366,7 +366,7 @@ class Query
 			{
 				$where .= $aCond ['cond'] . " ";
 				$bHasSubQuery = false;
-				if ($aCond ['bind'] instanceof \APP\Engine\Database\Query)
+				if ($aCond ['bind'] instanceof \SimpleORM\Helper\Query)
 				{
 					list ( $sSubSql, $aSubBindParams ) = $aCond ['bind']->build ();
 					$bHasSubQuery = true;
