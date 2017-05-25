@@ -10,8 +10,12 @@ class Model
 	protected $_sClassTable = "";
 	protected $_sTableName = "";
 	protected $_sHashID = "";
-	public function __construct()
+	public function __construct($sTableName = "")
 	{
+		if(!empty($sTableName))
+		{
+			$this->_sTableName = $sTableName;
+		}
 		$this->init();
 	}
 	public function getHashId()
@@ -55,6 +59,10 @@ class Model
 	{
 		$oTable = null;
 		$sTableName = Connector::getTableName($sTableName);
+		if(!count($aOptions))
+		{
+			$aOptions = Connector::getInstance()->getTableConfig($sTableName);
+		}
 		if(!empty($sClassName) && class_exists($sClassName))
 		{
 			$oTable = new $sClassName($aOptions);

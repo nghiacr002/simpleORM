@@ -58,9 +58,7 @@ class Reference
 	protected function _getManyToMany()
 	{
 		$oModelDestination = $this->getDestination()->getModel();
-		//$oModelSource = $this->getSource()->getModel();
 		$aOption = isset($this->_aParams['option']) ? $this->_aParams['option'] : array();
-
 		if(!isset($aOption['bridge']) || !isset($aOption['bridge']['table']))
 		{
 			throw new Exception("No bridge table found");
@@ -69,7 +67,6 @@ class Reference
 		{
 			throw new Exception("No bridge condition found");
 		}
-
 		$mRefData = isset($this->_aParams['ref_data']) ? $this->_aParams['ref_data'] : array();
 		$oQuery = $oModelDestination->createQuery("SELECT");
 		$sAlias = $aOption['bridge']['table'];

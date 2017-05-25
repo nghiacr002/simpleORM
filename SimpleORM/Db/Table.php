@@ -4,6 +4,7 @@ namespace SimpleORM\Db;
 
 use SimpleORM\Helper\Connector;
 use SimpleORM;
+use SimpleORM\Helper\Tool;
 
 class Table
 {
@@ -88,17 +89,7 @@ class Table
     }
     public function getColumns()
     {
-        $adapter = $this->getAdapter();
-        $results = $adapter->execute("SHOW COLUMNS FROM " . $this->_sTableName);
-
-        $columns = array();
-        foreach ($results as $result)
-        {
-            $field = $result['Field'];
-            unset($result['Field']);
-            $columns[$field] = $result;
-        }
-        return $columns;
+        return Tool::getTableColumns($this->_sTableName);
     }
     public function setAdapter($oAdapter)
     {
@@ -137,13 +128,39 @@ class Table
     protected function config()
     {
     	$aOptions = $this->_aOptions;
-    	if(isset($aOptions['primaryKey']))
+    	if(isset($aOptions['primary_keys']))
     	{
-    		$this->_mPrimaryKey = $aOptions['primaryKey'];
+    		if(is_array($aOptions['primary_keys']) && count($aOptions['primary_keys']) ==  1)
+    		{
+    			$aOptions['primary_keys'] = $aOptions['primary_keys'][0];
+    		}
+    		$this->_mPrimaryKey = $aOptions['primary_keys'];
     	}
     	if(isset($aOptions['alias']))
     	{
     		$this->_sAlias = $aOptions['alias'];
+    	}
+    	if(isset($aOptions['relations']) && count($aOptions['relations']))
+    	{
+
+			foreach($aOptions['relations'] as $sKey => $aRelationConfig)
+			{
+				switch ($aRelationConfig['type'])
+				{
+					case Relation::ONE_TO_MANY:
+						$this->_oRelation->hasMany($sKey,$aRelationConfig);
+						break;
+					case Relation::ONE_TO_ONE:
+						$this->_oRelation->hasOne($sKey,$aRelationConfig);
+						break;
+					case Relation::MANY_TO_ONE:
+						$this->_oRelation->belongsTo($sKey,$aRelationConfig);
+						break;
+					case Relation::MANY_TO_MANY:
+						$this->_oRelation->hasManyToMany($sKey,$aRelationConfig);
+						break;
+				}
+			}
     	}
     	return true;
     }

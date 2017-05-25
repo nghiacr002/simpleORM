@@ -7,6 +7,7 @@ class Connector
 	private $_oAdapter = null;
 	private $_aConfigs = array();
 	private static $instance;
+	private $_aTableConfigs = array();
 	public function __construct($aConfigs = array())
 	{
 		self::$instance = $this;
@@ -37,6 +38,19 @@ class Connector
 		}
 		$oAdapter->connect($aConfigs);
 		$this->_oAdapter = $oAdapter;
+	}
+	public function setTableConfigs($aParams = array())
+	{
+		$this->_aTableConfigs = $aParams;
+		return $this;
+	}
+	public function getTableConfig($sTableName)
+	{
+		return isset($this->_aTableConfigs[$sTableName]) ? $this->_aTableConfigs[$sTableName] : array();
+	}
+	public function getConfigs()
+	{
+		return $this->_aConfigs;
 	}
 	public static function getTableName($sName)
 	{

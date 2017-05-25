@@ -1,7 +1,7 @@
 <?php
-use DbTest\Client\Model as ClientModel;
+//use DbTest\Client\Model as ClientModel;
 use SimpleORM\Helper\Connector;
-
+use SimpleORM\Db\Model;
 require_once 'DbTest/autoload.php';
 require_once '../SimpleORM/autoload.php';
 @error_reporting(E_ALL);
@@ -17,23 +17,27 @@ $configs = array( 'host' => 'localhost',
 	'type' => 'mysql'
 );
 $db = new Connector($configs);
+//create the database configuration mapper file
 /*
-$oModel = new Model("client");
-$oModel->getTable()->setPrimaryKey("client_id");
-$mData = $oModel->createQuery()->where('client_id',1,'>')->select('*')->getAll();
-if(count($mData))
-{
-	foreach($mData as $mRow)
-	{
-		$mRow->joined_time = time();
-		$mRow->update();
-	}
-}
- */
+	$sSavePath = dirname(__FILE__) .DIRECTORY_SEPARATOR;
+	SimpleORM\Helper\Tool::generateConfigFile($db,$sSavePath);
+	exit;
+*/
 
-$oModel = new ClientModel();
+$sConfigDBFile = dirname(__FILE__) .DIRECTORY_SEPARATOR . 'dbconfig.php';
+if(file_exists($sConfigDBFile))
+{
+	require_once $sConfigDBFile;
+	$db->setTableConfigs($DB_TABLES);
+}
+$oModel = new Model("client");
+//$oModel->getTable()->setPrimaryKey("client_id");
+$mData = $oModel->createQuery()->where('client_id',1,'>')->select('*')->getOne();
+die();
+// custom table
+/*$oModel = new ClientModel();
 $oClientRow = $oModel->getOne(array('client_id',1,'>'));
-/*$oClientRow->getRelation()->hasOne('info',array(
+$oClientRow->getRelation()->hasOne('info',array(
 	'source' => 'client_id',
 	'target' => 'client_id',
 	'table' => 'client_info'
@@ -64,5 +68,14 @@ $oClientRow->getRelation()->hasManyToMany('groups',array(
 		)
 	)
 ));*/
-var_dump($oClientRow->groups);
-die();
+
+
+
+
+function d($mInfo, $bVarDump = false)
+{
+	$bCliOrAjax = (PHP_SAPI == 'cli');
+	(!$bCliOrAjax ? print '<pre style="text-align:left; padding-left:15px;">' : false);
+	($bVarDump ? var_dump($mInfo) : print_r($mInfo));
+	(!$bCliOrAjax ? print '</pre>' : false);
+}
