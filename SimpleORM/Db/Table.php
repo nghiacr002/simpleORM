@@ -108,7 +108,6 @@ class Table
 	{
 		if(!$this->_oAdapter)
 		{
-			//$this->_oAdapter = Connector::getInstance()->getAdapter();
 			$this->setAdapter(Connector::getInstance()->getAdapter());
 		}
 		return $this->_oAdapter;

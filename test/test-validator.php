@@ -1,6 +1,7 @@
 <?php
 use SimpleORM\Helper\Connector;
 use SimpleORM\Db\Model;
+use SimpleORM\Helper\Validator;
 require_once 'DbTest/autoload.php';
 require_once '../SimpleORM/autoload.php';
 @error_reporting(E_ALL);
@@ -24,8 +25,23 @@ if(file_exists($sConfigDBFile))
 	$db->setTableConfigs($DB_TABLES);
 }
 $oModel = new Model("client");
-$mData = $oModel->createQuery()->where('client_id',1,'>')->select('*')->getAll();
-d($mData);
+//create new Row;
+$oNewRow = $oModel->getTable()->createRow();
+
+$oNewRow->setValidateRules(array(
+	'client_name' => array(
+		'required' => true,
+		'type' => Validator::TYPE_STRING
+	)
+));
+if(!$oNewRow->isValid())
+{
+	var_dump($oNewRow->getErrors());
+}
+else
+{
+	die('no error');
+}
 exit;
 
 

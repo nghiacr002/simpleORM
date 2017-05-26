@@ -2,15 +2,23 @@
 namespace SimpleORM\Db;
 use SimpleORM\Helper\Query as Query;
 use SimpleORM\Helper\Object;
+use SimpleORM\Helper\Validator;
 class Row extends Object
 {
     protected $_oTable;
     protected $_oValidator;
     protected $_aErrors;
     protected $_aData;
+    protected $_aValidateRules = array();
     public function __construct()
     {
+    	$this->_oValidator = new Validator();
 		$this->init();
+    }
+    public function setValidateRules($aRules = array())
+    {
+		$this->_aValidateRules = $aRules;
+		return $this;
     }
     protected function init()
     {
@@ -111,6 +119,25 @@ class Row extends Object
         $query->from($this->_oTable->getTableName());
         $bResult = $query->execute();
         return $bResult;
+    }
+    public function isValid()
+    {
+    	$bResult = true;
+		if(is_array($this->_aValidateRules) && count($this->_aValidateRules))
+		{
+			foreach($this->_aValidateRules as $sFieldName => $aRule)
+			{
+				$mValue = $this->{$sFieldName};
+				$sType = isset($aRule['type']) ? $aRule['type'] : Validator::TYPE_STRING;
+				if(!$this->_oValidator->check($mValue,$sType,$aRule))
+				{
+					$aErrors = $this->_oValidator->getErrors();
+					$this->setError("[".$sFieldName."] " . implode(',',$aErrors));
+					$bResult = false;
+				}
+			}
+		}
+		return $bResult;
     }
     public function beforeSave()
     {
