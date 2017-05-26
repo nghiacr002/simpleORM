@@ -67,6 +67,7 @@ class Tool
 		$sDatabaseName = $aConfigs['name'];
 		$aResults = $oAdapter->execute("SHOW TABLES;");
 		$aTables = array();
+		$sFileName = $sSavePath . "dbconfig.php";
 		if(count($aResults))
 		{
 			foreach($aResults as $iKey => $aTable)
@@ -137,11 +138,11 @@ class Tool
 					}
 				}
 			}
-			$sFileName = $sSavePath . "dbconfig.php";
+
 			@file_put_contents($sFileName, "<?php \$DB_TABLES = " . var_export($aTableConfigs,true). ";");
 			@chmod($sFileName, 0777);
 		}
-		echo "Done";exit;
+		return $sFileName;
 	}
 	public static function getTableColumns($sTable, Connector $connector = null)
 	{

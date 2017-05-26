@@ -262,7 +262,7 @@ class Query
 		$this->_aPager = array ();
 		return $this;
 	}
-	public function getSqlStatement()
+	public function getProcessedSQL()
 	{
 		return $this->_sSQL;
 	}

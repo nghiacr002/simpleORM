@@ -17,59 +17,43 @@ $configs = array( 'host' => 'localhost',
 	'type' => 'mysql'
 );
 $db = new Connector($configs);
-//create the database configuration mapper file
-/*
-	$sSavePath = dirname(__FILE__) .DIRECTORY_SEPARATOR;
-	SimpleORM\Helper\Tool::generateConfigFile($db,$sSavePath);
-	exit;
-*/
-
-$sConfigDBFile = dirname(__FILE__) .DIRECTORY_SEPARATOR . 'dbconfig.php';
-if(file_exists($sConfigDBFile))
-{
-	require_once $sConfigDBFile;
-	$db->setTableConfigs($DB_TABLES);
-}
-$oModel = new Model("client");
-//$oModel->getTable()->setPrimaryKey("client_id");
-$mData = $oModel->createQuery()->where('client_id',1,'>')->select('*')->getOne();
-die();
 // custom table
-/*$oModel = new ClientModel();
+$oModel = new \DbTest\Client\Model();
 $oClientRow = $oModel->getOne(array('client_id',1,'>'));
+d($oClientRow);
+//force set custom relation'
 $oClientRow->getRelation()->hasOne('info',array(
-	'source' => 'client_id',
-	'target' => 'client_id',
-	'table' => 'client_info'
+		'source' => 'client_id',
+		'target' => 'client_id',
+		'table' => 'client_info'
 ));
 $oClientRow->getRelation()->hasMany('apps',array(
-	'source' => 'client_id',
-	'target' => 'client_id',
-	'table' => 'client_app'
+		'source' => 'client_id',
+		'target' => 'client_id',
+		'table' => 'client_app'
 ));
 $oClientRow->getRelation()->belongsTo('client_type',array(
-	'source' => 'level',
-	'target' => 'id',
-	'table' => 'client_type',
+		'source' => 'level',
+		'target' => 'id',
+		'table' => 'client_type',
 ));
 $oClientRow->getRelation()->hasManyToMany('groups',array(
-	'source' => 'client_id',
-	'target' => 'id',
-	'table' => 'group',
-	'option' => array(
-		'bridge' => array(
-			'table' => 'client_group',
-			'source' => array(
-				'client_id' => 'client_id'
-			),
-			'target' => array(
-				'id' => 'group_id',
-			)
+		'source' => 'client_id',
+		'target' => 'id',
+		'table' => 'group',
+		'option' => array(
+				'bridge' => array(
+						'table' => 'client_group',
+						'source' => array(
+								'client_id' => 'client_id'
+						),
+						'target' => array(
+								'id' => 'group_id',
+						)
+				)
 		)
-	)
-));*/
-
-
+));
+d($oClientRow->groups);
 
 
 function d($mInfo, $bVarDump = false)
