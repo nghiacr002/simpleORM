@@ -28,15 +28,15 @@ $oModel = new Model("client");
 //create new Row;
 $oNewRow = $oModel->getTable()->createRow();
 
-$oNewRow->setValidateRules(array(
+/*$oNewRow->setValidateRules(array(
 	'client_name' => array(
 		'required' => true,
 		'type' => Validator::TYPE_STRING
 	)
-));
+));*/
 if(!$oNewRow->isValid())
 {
-	var_dump($oNewRow->getErrors());
+	d($oNewRow->getErrors());
 }
 else
 {

@@ -36,7 +36,20 @@ $DB_TABLES = array (
 								'type' => 'OneToMany'
 						)
 				),
-				'options' => array ()
+				'options' => array (
+						'validate_rules' => array (
+								'client_name' => array (
+										'required' => true,
+										'type' => 'string',
+										'max_length' => '255'
+								),
+								'level' => array (
+										'required' => true,
+										'type' => 'number',
+										'max_length' => '11'
+								)
+						)
+				)
 		),
 		'tbl_client_app' => array (
 				'columns' => array (
@@ -55,7 +68,20 @@ $DB_TABLES = array (
 								'type' => 'ManyToOne'
 						)
 				),
-				'options' => array ()
+				'options' => array (
+						'validate_rules' => array (
+								'client_id' => array (
+										'required' => true,
+										'type' => 'number',
+										'max_length' => '11'
+								),
+								'app_name' => array (
+										'required' => true,
+										'type' => 'string',
+										'max_length' => '255'
+								)
+						)
+				)
 		),
 		'tbl_client_group' => array (
 				'columns' => array (
@@ -80,7 +106,20 @@ $DB_TABLES = array (
 								'type' => 'ManyToOne'
 						)
 				),
-				'options' => array ()
+				'options' => array (
+						'validate_rules' => array (
+								'client_id' => array (
+										'required' => true,
+										'type' => 'number',
+										'max_length' => '11'
+								),
+								'group_id' => array (
+										'required' => true,
+										'type' => 'number',
+										'max_length' => '11'
+								)
+						)
+				)
 		),
 		'tbl_client_info' => array (
 				'columns' => array (
@@ -100,7 +139,15 @@ $DB_TABLES = array (
 								'type' => 'ManyToOne'
 						)
 				),
-				'options' => array ()
+				'options' => array (
+						'validate_rules' => array (
+								'client_id' => array (
+										'required' => true,
+										'type' => 'number',
+										'max_length' => '11'
+								)
+						)
+				)
 		),
 		'tbl_client_type' => array (
 				'columns' => array (
@@ -119,7 +166,15 @@ $DB_TABLES = array (
 								'type' => 'OneToMany'
 						)
 				),
-				'options' => array ()
+				'options' => array (
+						'validate_rules' => array (
+								'level_name' => array (
+										'required' => true,
+										'type' => 'string',
+										'max_length' => '255'
+								)
+						)
+				)
 		),
 		'tbl_group' => array (
 				'columns' => array (
@@ -138,6 +193,14 @@ $DB_TABLES = array (
 								'type' => 'OneToMany'
 						)
 				),
-				'options' => array ()
+				'options' => array (
+						'validate_rules' => array (
+								'name' => array (
+										'required' => true,
+										'type' => 'string',
+										'max_length' => '255'
+								)
+						)
+				)
 		)
 );

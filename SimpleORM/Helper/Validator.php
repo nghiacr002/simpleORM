@@ -5,6 +5,8 @@ class Validator
 	const TYPE_STRING = "string";
 	const TYPE_NUMBER = "number";
 	const TYPE_ARRAY = "array";
+	const TYPE_DATE = "date";
+	const TYPE_OBJECT = "object";
 	private $_aErrors = array();
 
 	public function check($sValue, $sType = "", $aRules = array())
@@ -22,7 +24,7 @@ class Validator
 		{
 			if($sValue === null || $sValue == "")
 			{
-				$this->setError("Field is not existed");
+				$this->setError("is not existed");
 				$bReturn = false;
 			}
 		}
@@ -30,7 +32,7 @@ class Validator
 		{
 			if(!preg_match($aRules['regex'], $sValue))
 			{
-				$this->setError("Not pass regex rule");
+				$this->setError("is not passed regex rule");
 				$bReturn = false;
 			}
 		}
@@ -60,7 +62,7 @@ class Validator
 		{
 			if(empty($sValue))
 			{
-				$this->setError("empty string");
+				$this->setError("is empty string");
 				return false;
 			}
 		}
@@ -68,7 +70,7 @@ class Validator
 		{
 			if(strlen($sValue) > $aRules['max_length'])
 			{
-				$this->setError("String is too long");
+				$this->setError("is too long");
 				return false;
 			}
 		}
@@ -76,7 +78,7 @@ class Validator
 		{
 			if(strlen($sValue) < $aRules['min_length'])
 			{
-				$this->setError("String is too short");
+				$this->setError("is too short");
 				return false;
 			}
 		}
@@ -84,16 +86,16 @@ class Validator
 	}
 	protected function checkNumber($sValue = null, $aRules = array())
 	{
-		if(!is_number($sValue))
+		if(!is_numeric($sValue))
 		{
-			$this->setError("not the number");
+			$this->setError("is not the number");
 			return false;
 		}
 		if(isset($aRules['max']))
 		{
 			if($sValue > $aRules['max'])
 			{
-				$this->setError("Number is greater than limitation");
+				$this->setError("is greater than limitation");
 				return false;
 			}
 		}
@@ -101,7 +103,15 @@ class Validator
 		{
 			if(strlen($sValue) < $aRules['min'])
 			{
-				$this->setError("Number is less than limitation");
+				$this->setError("is less than limitation");
+				return false;
+			}
+		}
+		if(isset($aRules['max_length']))
+		{
+			if(strlen($sValue) > $aRules['max_length'])
+			{
+				$this->setError("length is too long");
 				return false;
 			}
 		}
@@ -130,6 +140,55 @@ class Validator
 			}
 		}
 		return true;
+	}
+	protected function checkEmail($mValues = null, $aRules = array())
+	{
+		if($mValues && filter_var($email, FILTER_VALIDATE_EMAIL))
+		{
+			return true;
+		}
+		$this->setError($mValues . " is invalid email format");
+		return false;
+	}
+	public static function getType($sString)
+	{
+		$mLimit = null;
+		$sType = self::TYPE_STRING;
+		$sPredictType = "TEXT";
+		$sString = strtoupper($sString);
+		if(preg_match('/(.*?)\((.*?)\)/si', $sString,$aMatches))
+		{
+			if(count($aMatches) == 3)
+			{
+				$sPredictType = $aMatches[1];
+				$mLimit = $aMatches[2];
+			}
+		}
+		//type https://www.techonthenet.com/mysql/datatypes.php
+		$aLists = array(
+				self::TYPE_STRING => array(
+						'CHAR','VARCHAR','TINYTEXT','TEXT','MEDIUMTEXT','LONGTEXT','BINARY','VARBINARY','LONGTEXT'
+				),
+				self::TYPE_NUMBER => array(
+						'BIT','TINYINT','SMALLINT','MEDIUMINT','INT','INTEGER','BIGINT','DECIMAL','DEC','NUMERIC',
+						'FIXED','FLOAT','DOUBLE','BOOL','BOOLEAN',
+				),
+				self::TYPE_DATE => array(
+						'DATE','DATETIME','TIMESTAMP','TIME','YEAR'
+				),
+				self::TYPE_OBJECT => array(
+						'TINYBLOB','BLOB','MEDIUMBLOB'
+				)
+		);
+
+		foreach($aLists as $sTypeTmp => $aListSupportTypes)
+		{
+			if(in_array($sPredictType, $aListSupportTypes))
+			{
+				$sType = $sTypeTmp;break;
+			}
+		}
+		return array($sType, $mLimit);
 	}
 
 }

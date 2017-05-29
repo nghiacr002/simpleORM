@@ -24,6 +24,10 @@ class Table
 		$this->_aOptions = $aOptions;
         $this->config();
     }
+    public function getOptions()
+    {
+    	return $this->_aOptions;
+    }
     public function setOptions($aOptions = array(), $bReconfigure = true)
     {
     	$this->_aOptions = $aOptions;
@@ -84,6 +88,12 @@ class Table
     	{
     		$oRow->setTable($this);
     		$oRow->setFieldValues($mData);
+    		$aConfigs = $this->getOptions();
+    		$aOptions = isset($aConfigs['options']) ? $aConfigs['options'] : array();
+    		if(isset($aOptions['validate_rules']) && count($aOptions['validate_rules']))
+    		{
+    			$oRow->setValidateRules($aOptions['validate_rules']);
+    		}
     	}
         return $oRow;
     }
@@ -161,6 +171,7 @@ class Table
 				}
 			}
     	}
+
     	return true;
     }
 }

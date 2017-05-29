@@ -20,13 +20,40 @@ class Tool
 			'columns' => array(),
 			'primary_keys' => isset($aOptions['primary_keys']) ? $aOptions['primary_keys'] : array(),
 			'relations' => array(),
-			'options' => array()
+			'options' => array(
+				'validate_rules' => array()
+			)
 		);
+		//var_dump($aOptions['columns']);die();
 		if(isset($aOptions['columns']) && count($aOptions['columns']))
 		{
 			foreach($aOptions['columns'] as $sKey => $aColumn)
 			{
 				$aReturn['columns'][] = $sKey;
+				if(isset($aColumn['Null']) && strtoupper($aColumn['Null']) == "NO")
+				{
+					if(isset($aColumn['Extra']) && strtoupper($aColumn['Extra']) == "AUTO_INCREMENT")
+					{
+
+					}
+					else
+					{
+						list($sType, $mLimit) = Validator::getType($aColumn['Type']);
+						$aInfoRules = array(
+							'required' => true,
+							'type' => $sType,
+						);
+						if(is_numeric($mLimit))
+						{
+							$aInfoRules['max_length'] = $mLimit;
+						}else
+						{
+							$aInfoRules['limit'] = $mLimit;
+						}
+						$aReturn['options']['validate_rules'][$sKey] = $aInfoRules;
+					}
+
+				}
 			}
 		}
 		if(isset($aOptions['relations']) && count($aOptions['relations']))
@@ -79,7 +106,7 @@ class Tool
 					$aPrimaryKeys = array();
 					foreach($aColumns as $iKey => $aColumn)
 					{
-						if($aColumn['Key'] == "PRI")
+						if(strtoupper($aColumn['Key']) == "PRI")
 						{
 							$aPrimaryKeys[] = $iKey;
 						}

@@ -22,6 +22,14 @@ class Row extends Object
     }
     protected function init()
     {
+		if($this->_oTable)
+		{
+			$aOptions = $this->_oTable->getOptions();
+			if(isset($aOptions['validate_rules']) && count($aOptions['validate_rules']))
+			{
+				$this->setValidateRules($aOptions['validate_rules']);
+			}
+		}
     	return true;
     }
     public function getRelation()
