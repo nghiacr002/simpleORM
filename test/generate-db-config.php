@@ -1,6 +1,5 @@
 <?php
 use SimpleORM\Helper\Connector;
-require_once 'DbTest/autoload.php';
 require_once '../SimpleORM/autoload.php';
 @error_reporting(E_ALL);
 @ini_set('display_errors', -1);

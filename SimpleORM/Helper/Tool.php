@@ -5,12 +5,44 @@ use SimpleORM\Db\Relation;
 class Tool
 {
 	/**
+	 * Generate model to folder
+	 * @param unknown $sModelName
+	 * @param unknown $sSavePath
+	 */
+	public static function generateModelTable($sTableName, $sSavePath = null , $bIsOverwrite = false)
+	{
+		//get folder name
+		$sModelTablePathName = ucfirst($sTableName);
+		$aParts = explode("_",$sModelTablePathName);
+		if(count($aParts))
+		{
+			foreach($aParts as $iKey => $sName)
+			{
+				$aParts[$iKey] = ucfirst($sName);
+			}
+			$sModelTablePathName = implode("",$aParts);
+		}
+		//end get folder
+		$sTablePath = $sSavePath . ucfirst($sModelTablePathName) . DIRECTORY_SEPARATOR;
+		if(file_exists($sTablePath) && is_dir($sTablePath))
+		{
+			if(!$bIsOverwrite)
+			{
+				throw new Exception( "folder has been existed.");
+			}
+		}
+		@mkdir($sTablePath);
+		@chmod($sTablePath, 0775);
+
+	}
+	/**
 	 * Generate Table Classes
 	 * @param string $sTable
 	 * @param array $aOptions. Available options
 	 * array(
-	 * 	'save_path' => '',
-	 *  'folder' => '',
+	 * 	'primary_keys' =>  array(),
+	 *  'columns' =>  array(),
+	 *  'relations' => array(),
 	 * )
 	 */
 	public static function generateTable($sTable, $aOptions = array())
