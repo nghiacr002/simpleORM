@@ -8,6 +8,7 @@ class Table extends Base
 	protected $_mPrimaryKey = "client_id";
 	protected function config()
 	{
+		parent::config();
 		$oRelation = new Relation($this);
 		// 1-1
 		$oRelation->hasOne('info',array(

@@ -9,7 +9,7 @@ class Tool
 	 * @param unknown $sModelName
 	 * @param unknown $sSavePath
 	 */
-	public static function generateModelTable($sTableName, $sSavePath = null , $bIsOverwrite = false)
+	public static function generateModelTable($sTableName, $sSavePath = null , $bIsOverwrite = false, $sNameSpace = "")
 	{
 		//get folder name
 		$sModelTablePathName = ucfirst($sTableName);
@@ -33,7 +33,53 @@ class Tool
 		}
 		@mkdir($sTablePath);
 		@chmod($sTablePath, 0775);
-
+		//write model file
+		$sModelPathFile = $sTablePath . "Model.php"; 
+		$sNameSpace = $sNameSpace . ucfirst($sModelTablePathName);
+		$aContent = array(); 
+		$aContent[] = '<?php ';
+		$aContent[] = 'namespace '. $sNameSpace.';';
+		$aContent[] = 'use SimpleORM\\Db\\Model as Base;';
+		$aContent[] = 'class Model extends Base'; 
+		$aContent[] = '{';
+		$aContent[] = '	protected $_sTableName = "'.$sTableName.'";';
+		$aContent[] = '	protected $_sClassTable = "'.$sNameSpace.'\\Table";';
+		$aContent[] = '}';
+		self::writeCode2File($sModelPathFile, $aContent);
+		//write table file
+		$sTableFullName = Connector::getTableName($sTableName);
+		$aColumns = self::getTableColumns($sTableFullName);
+		$aPrimaryKeys = array();
+		foreach($aColumns as $iKey => $aColumn)
+		{
+			if(strtoupper($aColumn['Key']) == "PRI")
+			{
+				$aPrimaryKeys[] = $iKey;
+			}
+		}
+		if(count($aPrimaryKeys) == 1)
+		{
+			$aPrimaryKeys = $aPrimaryKeys[0];
+		}
+		{
+			$aPrimaryKeys = var_export($aPrimaryKeys,true);
+		}
+		$sTablePathFile = $sTablePath . "Table.php"; 
+		$aContent = array();
+		$aContent[] = '<?php ';
+		$aContent[] = 'namespace '. $sNameSpace.';';
+		$aContent[] = 'use SimpleORM\\Db\\Table as Base;';
+		$aContent[] = 'class Table extends Base';
+		$aContent[] = '{';
+		$aContent[] = '	protected $_sClassRow = "SimpleORM\\Db\\Row";';
+		$aContent[] = '	protected $_mPrimaryKey = '.$aPrimaryKeys.';';
+		$aContent[] = '	protected function config()';
+		$aContent[] = '	{';
+		$aContent[] = '		parent::config();';
+		$aContent[] = '		//your custom code here';
+		$aContent[] = '	}';
+		$aContent[] = '}';
+		self::writeCode2File($sTablePathFile, $aContent);
 	}
 	/**
 	 * Generate Table Classes
@@ -219,5 +265,18 @@ class Tool
 			$columns[$field] = $result;
 		}
 		return $columns;
+	}
+	private static function writeCode2File($sFileName, $aCodes)
+	{
+		$fp = fopen($sFileName, 'w');
+		if ($fp)
+		{
+			foreach ($aCodes as $iKey => $sContent)
+			{
+				fwrite($fp, $sContent . "\r\n");
+			}
+			@fclose($fp);
+			@chmod($sFileName,0775);
+		}
 	}
 }

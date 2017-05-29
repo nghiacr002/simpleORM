@@ -17,12 +17,6 @@ $configs = array( 'host' => 'localhost',
 );
 //file saved config name is "dbconfig.php"
 $db = new Connector($configs);
-$sConfigDBFile = dirname(__FILE__) .DIRECTORY_SEPARATOR . 'dbconfig.php';
-if(file_exists($sConfigDBFile))
-{
-	require_once $sConfigDBFile;
-	$db->setTableConfigs($DB_TABLES);
-}
 $sSaveModelPath = dirname(__FILE__) .DIRECTORY_SEPARATOR . 'DbTest' . DIRECTORY_SEPARATOR;
 $sTableName = get_param('table');
 if(get_param('path'))
@@ -33,9 +27,8 @@ if(is_writable($sSaveModelPath) && is_dir($sSaveModelPath))
 {
 	if(!empty($sTableName))
 	{
-		Tool::generateModelTable($sTableName,$sSaveModelPath);
+		Tool::generateModelTable($sTableName,$sSaveModelPath,false,"DbTest\\");
 	}
-
 }
 else
 {
